@@ -1,19 +1,20 @@
 import { authModalState } from "@/atoms/authModalAtom";
 import { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
 type SignupProps = {};
 
 const Signup: React.FC<SignupProps> = () => {
+  const router = useRouter();
   const setAuthModalState = useSetRecoilState(authModalState);
   const handleClick = () => {
     setAuthModalState((prev) => ({ ...prev, type: "login" }));
   };
   const [inputs, setInputs] = useState({
+    username: "",
     email: "",
-    displayName: "",
     password: "",
   });
 
@@ -24,11 +25,51 @@ const Signup: React.FC<SignupProps> = () => {
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("register");
+    try {
+      const response = await fetch("http://localhost:3000/api/Users/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(inputs),
+      });
+
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+
+      const data = await response.json();
+      console.log("Login success", data);
+      toast.success("Login success");
+      router.push("/user/problems");
+    } catch (error: any) {
+      console.log("Login failed", error.message);
+      toast.error(error.message);
+    }
   };
 
   return (
     <form className="space-y-6 px-6 pb-4" onSubmit={handleRegister}>
-      <h3 className="text-xl font-medium text-white">Register to LeetClone</h3>
+      <h3 className="text-xl font-medium text-white">Register </h3>
+      <div>
+        <label
+          htmlFor="displayName"
+          className="text-sm font-medium block mb-2 text-gray-300"
+        >
+          User Name
+        </label>
+        <input
+          onChange={handleChangeInput}
+          type="username"
+          name="username"
+          id="username"
+          className="
+        border-2 outline-none sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
+        bg-gray-600 border-gray-500 placeholder-gray-400 text-white
+    "
+          placeholder="enter username"
+        />
+      </div>
       <div>
         <label
           htmlFor="email"
@@ -45,28 +86,10 @@ const Signup: React.FC<SignupProps> = () => {
         border-2 outline-none sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
         bg-gray-600 border-gray-500 placeholder-gray-400 text-white
     "
-          placeholder="name@company.com"
+          placeholder="enter email"
         />
       </div>
-      <div>
-        <label
-          htmlFor="displayName"
-          className="text-sm font-medium block mb-2 text-gray-300"
-        >
-          Display Name
-        </label>
-        <input
-          onChange={handleChangeInput}
-          type="displayName"
-          name="displayName"
-          id="displayName"
-          className="
-        border-2 outline-none sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
-        bg-gray-600 border-gray-500 placeholder-gray-400 text-white
-    "
-          placeholder="John Doe"
-        />
-      </div>
+
       <div>
         <label
           htmlFor="password"

@@ -5,16 +5,15 @@ import Login from "@/components/Modals/Login";
 import { useRecoilValue } from "recoil";
 import Navbar from "@/components/Navbar/Navbar";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function Home() {
   const authModal = useRecoilValue(authModalState);
+
   return (
     <>
       <Navbar />
-      <main>
-        <h1>home page</h1>
-        {authModal.isOpen && <AuthModal />}
-      </main>
+      {authModal.isOpen && <AuthModal />}
     </>
   );
 }

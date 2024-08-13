@@ -1,11 +1,13 @@
 import { authModalState } from "@/atoms/authModalAtom";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { toast } from "react-toastify";
+
 type LoginProps = {};
 
 const Login: React.FC<LoginProps> = () => {
+  const router = useRouter();
   const setAuthModalState = useSetRecoilState(authModalState);
   const handleClick = (type: "login" | "register" | "forgotPassword") => {
     setAuthModalState((prev) => ({ ...prev, type }));
@@ -21,11 +23,33 @@ const Login: React.FC<LoginProps> = () => {
     if (!inputs.email || !inputs.password)
       return alert("Please fill all fields");
     console.log(inputs.email, inputs.password);
+
+    try {
+      const response = await fetch("http://localhost:3000/api/Users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(inputs),
+      });
+
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+
+      const data = await response.json();
+      console.log("Login success", data);
+      toast.success("Login success");
+      router.push("/user/problems");
+    } catch (error: any) {
+      console.log("Login failed", error.message);
+      toast.error(error.message);
+    }
   };
 
   return (
     <form className="space-y-6 px-6 pb-4" onSubmit={handleLogin}>
-      <h3 className="text-xl font-medium text-white">Sign in to LeetClone</h3>
+      <h3 className="text-xl font-medium text-white">Sign in</h3>
       <div>
         <label
           htmlFor="email"
@@ -42,7 +66,7 @@ const Login: React.FC<LoginProps> = () => {
             border-2 outline-none sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
             bg-gray-600 border-gray-500 placeholder-gray-400 text-white
         "
-          placeholder="name@company.com"
+          placeholder="enter your email"
         />
       </div>
       <div>

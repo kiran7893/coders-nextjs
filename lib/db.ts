@@ -1,30 +1,25 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-const connect = async () => {
-  const connectionState = mongoose.connection.readyState;
-
-  if (connectionState === 1) {
-    console.log("Already connected");
-    return;
-  }
-
-  if (connectionState === 2) {
-    console.log("Connecting...");
-    return;
-  }
-
+export async function connect() {
   try {
-    mongoose.connect(MONGODB_URI!, {
-      dbName: "restapinext14",
-      bufferCommands: false,
-    });
-    console.log("Connected");
-  } catch (error) {
-    console.log("Error in connecting to database", error);
-    throw new Error("Error connecting to database");
-  }
-};
+    await mongoose.connect(
+      "mongodb+srv://myadaramsaikiran:CjtIiEAguQxSn55E@cluster0.oew7t.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+      { ssl: true, tlsInsecure: true }
+    );
+    const connection = mongoose.connection;
 
-export default connect;
+    connection.on("connected", () => {
+      console.log("MongoDB connected successfully");
+    });
+
+    connection.on("error", (err) => {
+      console.log(
+        "MongoDB connection error. Please make sure MongoDB is running. " + err
+      );
+      process.exit();
+    });
+  } catch (error) {
+    console.log("Something goes wrong!");
+    console.log(error);
+  }
+}
