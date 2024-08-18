@@ -16,7 +16,7 @@ export const problems: Problem[] = [
     category: "Array",
     order: 1,
     videoId: "8-k1C6ehKuw",
-    link: "https://github.com/kiran7893/Solutions/blob/main/two-sum.txt`",
+    link: "https://leetcode.com/problems/two-sum/",
   },
   {
     id: "reverse-linked-list",

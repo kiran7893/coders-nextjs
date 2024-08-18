@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <>
       <main>
-        <h1>admin home page</h1>
+        <h1>user home page</h1>
       </main>
     </>
   );

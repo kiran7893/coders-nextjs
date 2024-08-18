@@ -40,7 +40,8 @@ const Login: React.FC<LoginProps> = () => {
       const data = await response.json();
       console.log("Login success", data);
       toast.success("Login success");
-      router.push("/user/problems");
+
+      router.push(data.redirectUrl);
     } catch (error: any) {
       console.log("Login failed", error.message);
       toast.error(error.message);

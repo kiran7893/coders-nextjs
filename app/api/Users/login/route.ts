@@ -10,9 +10,8 @@ export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
     const { email, password } = reqBody;
-    console.log(reqBody);
 
-    //check if user exists
+    // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json(
@@ -20,33 +19,43 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.log("user exists");
 
-    //check if password is correct
+    // Check if password is correct
     const validPassword = await bcryptjs.compare(password, user.password);
     if (!validPassword) {
       return NextResponse.json({ error: "Invalid password" }, { status: 400 });
     }
-    console.log(user);
 
-    //create token data
+    // Create token data
     const tokenData = {
       id: user._id,
       username: user.username,
       email: user.email,
+      isAdmin: user.isAdmin,
     };
-    //create token
+
+    // Create token
     const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
       expiresIn: "1d",
     });
 
+    // Determine the redirection path based on user role
+    const redirectUrl = user.isAdmin ? "/admin" : "/user";
+
     const response = NextResponse.json({
       message: "Login successful",
       success: true,
+      redirectUrl, // Send the redirect URL in the response
     });
+
+    // Set the JWT token in a cookie
     response.cookies.set("token", token, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60, // 1 day
+      path: "/",
     });
+
     return response;
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
